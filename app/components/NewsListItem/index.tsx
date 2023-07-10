@@ -1,56 +1,60 @@
 import React from 'react';
-import {Text, View, Image, TouchableOpacity} from 'react-native';
-
-import Images from '../../images';
-import {Actions} from 'react-native-router-flux';
-import {SCREENS} from '../../utilities/constants';
-
-const {GiftBox, Diamond} = Images;
+import {
+  Text,
+  View,
+  Image,
+  TouchableOpacity,
+  Linking,
+  StyleSheet,
+} from 'react-native';
+import {DateTime} from 'luxon';
+import {Articles} from '../../redux/model/Articles';
 
 export const NewsListItem = (props: any) => {
   const {article} = props || {};
-  const {title, brand } = article || {};
+  const {source, author, title, description, url, urlToImage, publishedAt} =
+    (article as Articles) || {};
   return (
     <TouchableOpacity
       onPress={() => {
-        Actions[SCREENS.NEWS_DETAIL]({rewardItem: props});
+        Linking.canOpenURL(url).then(() => {
+          Linking.openURL(url);
+        });
       }}
-      style={{
-        borderRadius: 10,
-        backgroundColor: '#353535',
-        borderWidth: 1,
-        height: 225,
-        overflow: 'hidden',
-        marginVertical: 10,
-      }}>
+      style={style.articleItem}>
       <Image
-        source={GiftBox}
+        source={{uri: urlToImage}}
         resizeMode="cover"
-        style={{width: '100%', height: 225}}
+        style={style.image}
       />
-      <View
-        style={{
-          width: '100%',
-          height: 225,
-          backgroundColor: '#444',
-          position: 'absolute',
-          top: 0,
-          opacity: 0.4,
-        }}
-      />
-      <View
-        style={{
-          width: '100%',
-          height: 225,
-          position: 'absolute',
-          top: 0,
-          padding: 10,
-        }}>
-        <Text style={{color: '#fff', fontSize: 24, fontWeight: 'bold'}}>
-          {title}
+      <View style={style.articleContent}>
+        <Text style={style.title}>{title}</Text>
+        <Text style={style.desc}>{description}</Text>
+        <Text style={style.author}>{`By ${author} - ${source.name}`}</Text>
+        <Text style={style.time}>
+          {`${DateTime.fromISO(publishedAt).toFormat('dd LLL yyyy')}`}
         </Text>
-        <Text style={{color: '#fff', fontSize: 20}}>{brand}</Text>
       </View>
     </TouchableOpacity>
   );
 };
+
+const style = StyleSheet.create({
+  articleItem: {
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    overflow: 'hidden',
+    marginVertical: 10,
+  },
+  image: {width: '100%', height: 225},
+  articleContent: {
+    width: '100%',
+    minHeight: 100,
+    padding: 10,
+  },
+  title: {color: '#000', fontSize: 24, fontWeight: 'bold'},
+  desc: {color: '#444', fontSize: 16, lineHeight: 20},
+  author: {color: '#000', fontSize: 14, marginTop: 14},
+  time: {color: '#222', fontSize: 12, marginTop: 5},
+});

@@ -28,8 +28,6 @@ const NewsPage = () => {
     );
   }, []);
 
-  console.log('articles', articles);
-
   return (
     <>
       <ScrollView
@@ -48,7 +46,10 @@ const NewsPage = () => {
             placeholderTextColor={'#444'}
           />
         </View>
-        <View>{result.isLoading && <EmptyCardsLoader />}</View>
+        <View>
+          {breakingNewsResults.isLoading ||
+            (result.isLoading && <EmptyCardsLoader />)}
+        </View>
         <View>
           {!result.isLoading &&
             (articles || []).map(article => <NewsListItem article={article} />)}
@@ -67,7 +68,7 @@ const style = StyleSheet.create({
   },
   scrollViewContainer: {
     paddingTop: 85,
-    paddingBottom: 500,
+    paddingBottom: 200,
   },
   availableNewsHeader: {flex: 3, flexDirection: 'row'},
   availableNewsTitle: {flex: 2, flexDirection: 'column'},
