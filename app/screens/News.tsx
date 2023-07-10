@@ -1,22 +1,60 @@
-import React from 'react';
-import {Text, ScrollView, View, StyleSheet} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Text, TextInput, ScrollView, View, StyleSheet} from 'react-native';
+import {Articles} from '../redux/model/Articles';
+import {
+  useLazyGetBreakingNewsQuery,
+  useLazySearchNewsQuery,
+} from '../redux/api';
+import {EmptyCardsLoader} from '../components/EmptyCardsLoader';
+import {NewsListItem} from '../components/NewsListItem';
 
 const NewsPage = () => {
+  const [searchQuery, setSearchQuery] = useState<undefined | string>('');
+  const [articles, setArticles] = useState<Articles[]>([]);
+  const [searchArticles, result] = useLazySearchNewsQuery();
+  const [getBreakingNews, breakingNewsResults] = useLazyGetBreakingNewsQuery();
+
+  useEffect(() => {
+    searchArticles({search: `${searchQuery}`}).then(res => {
+      if (res.isSuccess) {
+        setArticles(res.data?.articles);
+      }
+    });
+  }, [searchQuery]);
+
+  useEffect(() => {
+    getBreakingNews({country: 'us'}).then(
+      res => res.isSuccess && setArticles(res.data?.articles),
+    );
+  }, []);
+
+  console.log('articles', articles);
+
   return (
-    <ScrollView
-      nestedScrollEnabled
-      style={style.scrollViewMain}
-      contentContainerStyle={style.scrollViewContainer}>
-      <View style={style.availableNewsHeader}>
-        <View style={style.availableNewsTitle}>
-          <Text style={style.availableNewsTitleText}>Top News</Text>
+    <>
+      <ScrollView
+        nestedScrollEnabled
+        style={style.scrollViewMain}
+        contentContainerStyle={style.scrollViewContainer}>
+        <View>
+          <Text style={style.availableNewsTitleText}>Search News</Text>
         </View>
-      </View>
-      <View style={style.divider} />
-      <ScrollView horizontal style={{marginVertical: 20}}>
-        <View />
+        <View style={style.newsSearchQuery}>
+          <TextInput
+            value={searchQuery}
+            onChangeText={(text: string) => setSearchQuery(text)}
+            style={{color: '#000'}}
+            placeholder="Search..."
+            placeholderTextColor={'#444'}
+          />
+        </View>
+        <View>{result.isLoading && <EmptyCardsLoader />}</View>
+        <View>
+          {!result.isLoading &&
+            (articles || []).map(article => <NewsListItem article={article} />)}
+        </View>
       </ScrollView>
-    </ScrollView>
+    </>
   );
 };
 
@@ -28,41 +66,18 @@ const style = StyleSheet.create({
     paddingHorizontal: 20,
   },
   scrollViewContainer: {
-    paddingBottom: 200,
+    paddingTop: 85,
+    paddingBottom: 500,
   },
   availableNewsHeader: {flex: 3, flexDirection: 'row'},
   availableNewsTitle: {flex: 2, flexDirection: 'column'},
   availableNewsTitleText: {color: '#fff', fontWeight: 'bold', fontSize: 24},
-  myNewsBtnContainer: {
-    flex: 1.5,
-    flexDirection: 'column',
-    alignContent: 'flex-end',
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end',
-  },
-  myNewsBtn: {
-    borderRadius: 10,
-    paddingVertical: 10,
+  newsSearchQuery: {
+    height: 50,
+    marginTop: 10,
+    backgroundColor: '#ccc',
+    borderRadius: 20,
     paddingHorizontal: 20,
-    backgroundColor: '#353535',
-    flexDirection: 'row',
-    alignContent: 'flex-end',
-    justifyContent: 'center',
-  },
-  myNewsBtnText: {
-    color: '#ffd119',
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginRight: 10,
-  },
-  rewardDescription: {flex: 1, flexDirection: 'row', marginVertical: 20},
-  rewardDescText: {color: '#fff', fontSize: 14, lineHeight: 18},
-  divider: {
-    flex: 1,
-    flexDirection: 'row',
-    marginVertical: 10,
-    borderColor: '#303030',
-    borderWidth: 1,
   },
 });
 

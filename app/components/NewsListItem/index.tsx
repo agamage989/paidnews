@@ -8,7 +8,8 @@ import {SCREENS} from '../../utilities/constants';
 const {GiftBox, Diamond} = Images;
 
 export const NewsListItem = (props: any) => {
-  const {title, brand, price} = props || {};
+  const {article} = props || {};
+  const {title, brand } = article || {};
   return (
     <TouchableOpacity
       onPress={() => {
@@ -49,30 +50,6 @@ export const NewsListItem = (props: any) => {
           {title}
         </Text>
         <Text style={{color: '#fff', fontSize: 20}}>{brand}</Text>
-
-        <View
-          style={{
-            borderRadius: 10,
-            backgroundColor: '#353535CC',
-            paddingVertical: 5,
-            paddingHorizontal: 15,
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'center',
-            alignContent: 'center',
-            flex: 0,
-            maxWidth: 150,
-            position: 'absolute',
-            bottom: 10,
-            left: 10,
-          }}>
-          <Text
-            style={{
-              color: '#fff',
-              marginRight: 10,
-            }}>{`Get it for ${price}`}</Text>
-          <Diamond fill="#fff" width={30} height={30} />
-        </View>
       </View>
     </TouchableOpacity>
   );

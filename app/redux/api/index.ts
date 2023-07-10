@@ -9,11 +9,14 @@ type SearchNewsAPIQuery = {
   search: string;
 };
 
-const authenticatedURL = (url: string, params: any) =>
-  `${url}?${new URLSearchParams({
+const authenticatedURL = (url: string, params: any) => {
+  console.log('url, params', url, params);
+
+  return `${url}?${new URLSearchParams({
     ...params,
     apiKey: Config.API_KEY,
   }).toString()}`;
+};
 
 export const newsApi = createApi({
   reducerPath: 'newsApi',
